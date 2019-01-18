@@ -12,7 +12,7 @@ public class server implements Runnable{
     public server(){
         Boolean init = true;
     }
-    public static void main(String[] args){
+    public static void main(){
         try{
             host = new ServerSocket(80);
             client = host.accept();
@@ -22,10 +22,9 @@ public class server implements Runnable{
                 new Thread(server1).start();
             }
         }catch(IOException e){
-            System.err.println("Server error: " + e.getMessage());
+            System.err.println("Server error (IOException, line 25): " + e.getMessage());
         }
     }
-    //@Override
     public void run(){
         BufferedReader in = null;
         PrintWriter out = null;
@@ -58,24 +57,23 @@ public class server implements Runnable{
             } else {
                 // GET or HEAD method
                 if (fileRequested.endsWith("/")) {
-                    fileRequested += app.getDefaultFile(); //WRITE THIS METHOD
+                    fileRequested += app.getDefaultFile();
                 }
 
                 File file = new File(new File("."), fileRequested);
                 int fileLength = (int) file.length();
                 String content = getContentType(fileRequested);
 
-                if (method.equals("GET")) { // GET method so we return content
+                if (method.equals("GET")){
                     byte[] fileData = readFileData(file, fileLength);
 
-                    // send HTTP Headers
                     out.println("HTTP/1.1 200 OK");
                     out.println("Server: EasyServer : 1.0");
                     out.println("Date: " + new Date());
                     out.println("Content-type: " + content);
                     out.println("Content-length: " + fileLength);
-                    out.println(); // blank line between headers and content, very important !
-                    out.flush(); // flush character output stream buffer
+                    out.println();
+                    out.flush();
 
                     dataOut.write(fileData, 0, fileLength);
                     dataOut.flush();
@@ -85,11 +83,11 @@ public class server implements Runnable{
             try {
                 fileNotFound(out, dataOut, fileRequested);
             } catch (IOException e) {
-                System.err.println("Error: " + e.getMessage());
+                System.err.println("Server error (IOException, line 87): " + e.getMessage());
             }
 
         } catch (IOException ioe) {
-            System.err.println("Server error : " + ioe);
+            System.err.println("Server error (IOException, line 91): " + ioe);
         } finally {
             try {
                 in.close();
@@ -97,11 +95,11 @@ public class server implements Runnable{
                 dataOut.close();
                 client.close(); // we close socket connection
             } catch (Exception e) {
-                System.err.println("Error closing stream : " + e.getMessage());
+                System.err.println("Server error (could not close stream, line 100): " + e.getMessage());
             }
         }
     }
-    private byte[] readFileData(File file, int fileLength) throws IOException {
+    private byte[] readFileData(File file, int fileLength) throws IOException{
         FileInputStream fileIn = null;
         byte[] fileData = new byte[fileLength];
 
@@ -117,26 +115,27 @@ public class server implements Runnable{
     }
 
     // return supported MIME Types
-    private String getContentType(String fileRequested) {
-        if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
+    private String getContentType(String fileRequested){
+        if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html")){
             return "text/html";
-        else
+        }else {
             return "text/plain";
+        }
     }
 
-    private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException {
+    private void fileNotFound(PrintWriter out, OutputStream dataOut, String fileRequested) throws IOException{
         File file = new File(new File("."), "404.html");
         int fileLength = (int) file.length();
         String content = "text/html";
         byte[] fileData = readFileData(file, fileLength);
 
         out.println("HTTP/1.1 404 File Not Found");
-        out.println("Server: Java HTTP Server from SSaurel : 1.0");
+        out.println("Server: EasyServer : 1.0");
         out.println("Date: " + new Date());
         out.println("Content-type: " + content);
         out.println("Content-length: " + fileLength);
-        out.println(); // blank line between headers and content, very important !
-        out.flush(); // flush character output stream buffer
+        out.println();
+        out.flush();
 
         dataOut.write(fileData, 0, fileLength);
         dataOut.flush();
