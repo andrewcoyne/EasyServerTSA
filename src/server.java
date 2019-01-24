@@ -14,10 +14,10 @@ public class server implements Runnable{
     private server(Socket s){
         client = s;
     }
-    static void main(String f){
+    static void main(String f, int port){
         folder = f;
         try{
-            ServerSocket host = new ServerSocket(8080);
+            ServerSocket host = new ServerSocket(port);
             //client = host.accept();
 
             while(true){
