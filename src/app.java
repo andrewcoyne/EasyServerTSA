@@ -3,15 +3,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class app {
 
     private static JFrame frame = new JFrame("EasyServer");
-    private static Boolean serverIsOn = false;
-    private static String folder = ".";
-    private static int serverPort = 8080;
+    static String folder = ".";
+    static int serverPort = 8080;
 
     public static void main(String[] args){
         buildFrame();
@@ -69,7 +67,7 @@ public class app {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         int port = Integer.parseInt(text.getText());
-                        if(portIsAvailable(port)){
+                        if(portIsAvailable(port) && isPortNotCommonlyUsed(port)){
                             serverPort = port;
                             status.setText("<html>Port successfully changed. Remember that this does not guarantee that EasyServer will work on this port.</html>");
                         }else{
@@ -104,7 +102,8 @@ public class app {
             @Override
             public void actionPerformed(ActionEvent e){
                 JFileChooser chooser = new JFileChooser();
-                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);chooser.setAcceptAllFileFilterUsed(false);
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                chooser.setAcceptAllFileFilterUsed(false);
                 if (chooser.showOpenDialog(findButton) == JFileChooser.APPROVE_OPTION) {
                     setFolder(chooser.getSelectedFile().toString());
                 }
@@ -120,13 +119,7 @@ public class app {
         startButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                if(!serverIsOn) {
-                    serverStarter.main(folder, serverPort);
-                    serverIsOn = !serverIsOn;
-                }else{
-                    server.stop();
-                    serverIsOn = !serverIsOn;
-                }
+                serverStarter.main();
             }
         });
         frame.getContentPane().add(startButton, BorderLayout.SOUTH);
@@ -157,7 +150,40 @@ public class app {
         }
     }
 
+    private static boolean isPortNotCommonlyUsed(int serverPort){
+        int[] wellKnownPorts = new int[] {0,1,5,7,9,11,13,15,17,18,19,20,21,22,23,25,37,42,43,47,49,51,52,53,54,56,58,
+                                          61,67,68,69,70,71,72,73,74,79,81,82,88,90,101,102,104,105,107,108,109,110,111,
+                                          113,115,117,118,119,123,126,135,137,138,139,143,152,153,156,158,161,162,170,
+                                          177,179,194,201,209,210,213,218,220,225,226,227,228,229,230,231,232,233,234,
+                                          235,236,237,238,239,240,241,249,250,251,252,253,254,255,259,262,264,280,300,
+                                          308,311,318,319,320,350,351,356,366,369,370,371,383,384,387,388,389,399,401,
+                                          427,433,434,443,444,445,464,465,475,491,497,500,502,504,510,512,513,514,515,
+                                          517,518,520,521,524,525,530,532,533,540,542,543,544,546,547,548,550,554,556,
+                                          560,561,563,564,585,993,587,591,593,601,604,623,625,631,635,636,639,641,643,
+                                          646,647,648,651,653,654,655,657,660,666,674,688,690,691,694,695,698,700,701,
+                                          702,706,711,712,749,750,751,752,753,754,760,782,783,800,808,829,830,831,832,
+                                          833,843,847,848,853,860,861,862,873,888,897,898,902,903,953,981,987,989,990,
+                                          991,992,993,994,995,996,997,998,999,1000,1001,1002,1003,1004,1005,1006,1007,
+                                          1008,1009,1010,1011,1012,1013,1014,1015,1016,1017,1018,1019,1020,1021,1022,1023};
+        boolean works = true;
+        for(int i : wellKnownPorts){
+            if(i==serverPort){
+                works = false;
+            }
+        }
+        return works;
+    }
+
     private static void setFolder(String folder1){
         folder = folder1;
+    }
+}
+
+class serverStarter implements Runnable{
+    public void run(){
+        server.main();
+    }
+    static void main(){
+        (new Thread(new serverStarter())).start();
     }
 }
