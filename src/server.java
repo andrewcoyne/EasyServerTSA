@@ -90,7 +90,7 @@ public class server implements Runnable{
                 in.close();
                 out.close();
                 dataOut.close();
-                client.close(); // we close socket connection
+                client.close();
             } catch (Exception e) {
                 System.err.println("Server error (could not close stream, line 100): " + e.getMessage());
             }
