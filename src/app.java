@@ -2,9 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
+@SuppressWarnings("deprecation")
 public class app {
 
     private static JFrame frame = new JFrame("EasyServer");
@@ -16,7 +18,7 @@ public class app {
     }
 
     private static void buildFrame(){
-        frame.setPreferredSize(new Dimension(300,350));
+        frame.setPreferredSize(new Dimension(300,425));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -86,15 +88,12 @@ public class app {
 
         JLabel mainText = new JLabel("<html>Welcome to EasyServer! Simply find the folder containing your website's" +
                                           " files by clicking the button below, then click the 'Start Server' button at " +
-                                          "the bottom. To shut down the server, close this window.<br/><br/>NOTE: Make " +
-                                          "sure you have files in your folder named 'index.html' (your website's home " +
-                                          "page), '404.html' (for when someone attempts to find a file on your website" +
-                                          " that doesn't exist), and 'not_supported.html' (for when someone tries to " +
-                                          "interact with the website in a way that EasyServer doesn't support). <br/><html>");
+                                          "the bottom. To shut down the server, close this window.<br/><br/>");
         Font textfont = new Font("Arial", Font.PLAIN, 14);
         mainText.setFont(textfont);
-        frame.getContentPane().add(mainText, BorderLayout.BEFORE_FIRST_LINE);
+        frame.getContentPane().add(mainText);
 
+        JButton startButton = new JButton("Start Server");
 
         JButton findButton = new JButton("Select Server Files");
         findButton.setFont(textfont);
@@ -105,16 +104,25 @@ public class app {
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 chooser.setAcceptAllFileFilterUsed(false);
                 if (chooser.showOpenDialog(findButton) == JFileChooser.APPROVE_OPTION) {
-                    setFolder(chooser.getSelectedFile().toString());
+                    File[] files = chooser.getSelectedFile().listFiles();
+                    if(hasNeededFiles(files)) {
+                        setFolder(chooser.getSelectedFile().toString());
+                        findButton.setEnabled(false);
+                        startButton.setEnabled(true);
+                    }else{
+                        mainText.setText("<html>NOTE: Make sure you have files in your folder named 'index.html' (your " +
+                                "website's home page), '404.html' (for when a user tries to access an non-existent " +
+                                "webpage), and 'not_supported.html' (for when a user tries to interact with the " +
+                                "website in a way that EasyServer can't support).</html>");
+                    }
                 }
                 else {
                     System.out.println("No Selection ");
                 }
             }
         });
-        frame.getContentPane().add(findButton, BorderLayout.CENTER);
+        frame.getContentPane().add(findButton);
 
-        JButton startButton = new JButton("Start Server");
         startButton.setFont(textfont);
         startButton.addActionListener(new ActionListener(){
             @Override
@@ -122,10 +130,12 @@ public class app {
                 serverStarter.main();
             }
         });
-        frame.getContentPane().add(startButton, BorderLayout.SOUTH);
+        frame.getContentPane().add(startButton);
 
+        frame.setLayout(new GridLayout(3,1));
         frame.pack();
         frame.setVisible(true);
+        startButton.setEnabled(false);
     }
 
     static String getDefaultFile(){
@@ -144,9 +154,31 @@ public class app {
                 try {
                     s.close();
                 } catch (IOException e) {
-                    throw new RuntimeException("You should handle this error." , e);
+                    throw new RuntimeException("Error with figuring out if port is available." , e);
                 }
             }
+        }
+    }
+
+    private static boolean hasNeededFiles(File[] files){
+        boolean hasIndex = false;
+        boolean hasNot = false;
+        boolean has404 = false;
+        for(File i : files){
+            if(i.getName().equals("index.html")){
+                hasIndex = true;
+            }
+            if(i.getName().equals("not_supported.html")){
+                hasNot = true;
+            }
+            if(i.getName().equals("404.html")){
+                has404 = true;
+            }
+        }
+        if(hasIndex && hasNot && has404){
+            return true;
+        }else{
+            return false;
         }
     }
 
