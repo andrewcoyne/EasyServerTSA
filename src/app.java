@@ -18,7 +18,7 @@ public class app {
     }
 
     private static void buildFrame(){
-        frame.setPreferredSize(new Dimension(300,425));
+        frame.setPreferredSize(new Dimension(410,310));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -86,17 +86,21 @@ public class app {
         menuBar.add(menu);
         frame.setJMenuBar(menuBar);
 
+        //JPanel textPanel = new JPanel();
+        //textPanel.setMinimumSize(new Dimension(300,150));
         JLabel mainText = new JLabel("<html>Welcome to EasyServer! Simply find the folder containing your website's" +
                                           " files by clicking the button below, then click the 'Start Server' button at " +
                                           "the bottom. To shut down the server, close this window.<br/><br/>");
         Font textfont = new Font("Arial", Font.PLAIN, 14);
         mainText.setFont(textfont);
+        //textPanel.add(mainText);
         frame.getContentPane().add(mainText);
 
         JButton startButton = new JButton("Start Server");
 
         JButton findButton = new JButton("Select Server Files");
         findButton.setFont(textfont);
+        findButton.setMaximumSize(new Dimension(300,80));
         findButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
