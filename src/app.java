@@ -18,13 +18,16 @@ public class app {
     }
 
     private static void buildFrame(){
-        frame.setPreferredSize(new Dimension(410,310));
+        frame.setPreferredSize(new Dimension(410,350));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         }catch (Exception e){
-            System.err.println("Line 22 Error: " + e.getMessage());
+            System.err.println("Line 26 Error: " + e.getMessage());
         }
+        JPanel content = new JPanel();
+        content.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        frame.setContentPane(content);
 
         JMenuBar menuBar;
         JMenu menu;
@@ -90,7 +93,7 @@ public class app {
         //textPanel.setMinimumSize(new Dimension(300,150));
         JLabel mainText = new JLabel("<html>Welcome to EasyServer! Simply find the folder containing your website's" +
                                           " files by clicking the button below, then click the 'Start Server' button at " +
-                                          "the bottom. To shut down the server, close this window.<br/><br/>");
+                                          "the bottom. To shut down the server, close this window.<br><br/>");
         Font textfont = new Font("Arial", Font.PLAIN, 14);
         mainText.setFont(textfont);
         //textPanel.add(mainText);
@@ -101,6 +104,11 @@ public class app {
         JButton findButton = new JButton("Select Server Files");
         findButton.setFont(textfont);
         findButton.setMaximumSize(new Dimension(300,80));
+        findButton.getAccessibleContext().setAccessibleDescription(
+                "Make sure you have files in your folder named 'index.html'" +
+                "website's home page), '404.html' (for when a user tries to access an non-existent " +
+                "webpage), and 'not_supported.html' (for when a user tries to interact with the " +
+                "website in a way that EasyServer can't support).");
         findButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -132,11 +140,13 @@ public class app {
             @Override
             public void actionPerformed(ActionEvent e){
                 serverStarter.main();
+                startButton.setText("Server Started!");
+                startButton.setEnabled(false);
             }
         });
         frame.getContentPane().add(startButton);
 
-        frame.setLayout(new GridLayout(3,1));
+        frame.setLayout(new GridLayout(3,1, 10, 10));
         frame.pack();
         frame.setVisible(true);
         startButton.setEnabled(false);

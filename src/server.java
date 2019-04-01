@@ -13,13 +13,12 @@ public class server implements Runnable{
     static void main(){
         try{
             ServerSocket host = new ServerSocket(app.serverPort);
-
             while(true){
                 server server1 = new server(host.accept());
                 (new Thread(server1)).start();
             }
         }catch(IOException e){
-            System.err.println("Server error (IOException, line 25): " + e.getMessage());
+            System.err.println("Server error (IOException, line 21): " + e.getMessage());
         }
     }
     public void run(){
@@ -80,11 +79,11 @@ public class server implements Runnable{
             try {
                 fileNotFound(out, dataOut, fileRequested);
             } catch (IOException e) {
-                System.err.println("Server error (IOException, line 87): " + e.getMessage());
+                System.err.println("Server error (IOException, line 82): " + e.getMessage());
             }
 
         } catch (IOException ioe) {
-            System.err.println("Server error (IOException, line 91): " + ioe);
+            System.err.println("Server error (IOException, line 86): " + ioe);
         } finally {
             try {
                 in.close();
@@ -92,7 +91,7 @@ public class server implements Runnable{
                 dataOut.close();
                 client.close();
             } catch (Exception e) {
-                System.err.println("Server error (could not close stream, line 100): " + e.getMessage());
+                System.err.println("Server error (could not close stream, line 94): " + e.getMessage());
             }
         }
     }
@@ -138,3 +137,5 @@ public class server implements Runnable{
         dataOut.flush();
     }
 }
+
+//Server code based on https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd
